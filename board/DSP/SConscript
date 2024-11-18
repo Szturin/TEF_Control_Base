@@ -1,0 +1,22 @@
+Import('rtconfig')
+from building import *
+
+cwd = GetCurrentDir()
+src = Split('''
+''')
+CPPPATH = [cwd]             # 将当前路径加入构建搜索的头文件路径
+LIBPATH = [cwd]             # LIBPATH 指定库的路径，表示库的搜索路径是当前目录
+
+if rtconfig.CROSS_TOOL == 'gcc':
+    LIBS = ['arm_cortexM4lf_math']                    # GCC 下 LIBS 指定库的名称
+elif rtconfig.CROSS_TOOL == 'keil':
+    LIBS = ['arm_cortexM4lf_math']                # ARMCC 下 LIBS 指定库的名称
+else:
+    LIBS = ['libabc_iar']                 # IAR 下 LIBS 指定库的名称
+
+CPPDEFINES = ['ARM_MATH_LOOPUNROLL']
+CPPDEFINES = ['ARM_MATH_CM4']
+
+group = DefineGroup('arm-dsp', src, depend = ['RT_USING_ARMDSP'], LIBS = LIBS, LIBPATH=LIBPATH, CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+
+Return('group')

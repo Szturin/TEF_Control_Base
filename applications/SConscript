@@ -1,0 +1,39 @@
+import rtconfig
+from building import *
+import os
+
+cwd     = GetCurrentDir()
+CPPPATH = [cwd]
+
+# 初始化 path
+path = []
+
+# 源文件列表
+src = Split("""
+main.c
+RM_APP/PID/pid.c
+RM_APP/PID/pid_test_app.c
+RM_APP/imu/JY901USE.h
+RM_APP/ringbuffer/ringbuffer.c
+
+RM_BSP/bsp_system.h
+RM_BSP/can/bsp_can.c
+RM_APP/judge/JudgeMent.c
+RM_BSP/uart/bsp_JY901.c
+RM_BSP/uart/bsp_remoter_uart.c
+
+RM_TASK/chassic/chassis_task.c
+RM_TASK/gimbal//gimbal_task.c
+RM_TASK/shoot/shoot_task.c
+RM_TASK/cmd_parse/usart_task.c
+
+""")#在这里添加自定义的源文件
+
+# 包含路径（确保路径正确）
+path += [cwd + '/RM_APP']  # 可以使用 os.path.join 来确保路径分隔符的正确性
+path += [cwd + '/RM_TASK']
+path += [cwd + '/RM_BSP']
+# 定义应用程序组
+group = DefineGroup('Applications', src, depend = [''], CPPPATH = path)
+
+Return('group')

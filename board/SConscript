@@ -1,0 +1,69 @@
+import os
+import rtconfig
+from building import *
+
+Import('SDK_LIB')
+
+# 初始化环境
+env = Environment()
+
+cwd = GetCurrentDir()
+
+# 添加必要的源文件
+src = Split('''
+board.c
+CubeMX_Config/Src/stm32f4xx_hal_msp.c
+CubeMX_Config/Src/stm32f4xx_it.c
+CubeMX_Config/Src/stm32f4xx_hal_timebase_tim.c
+CubeMX_Config/Src/main.c
+CubeMX_Config/Src/dma.c
+CubeMX_Config/Src/gpio.c
+CubeMX_Config/Src/can.c
+CubeMX_Config/Src/spi.c
+CubeMX_Config/Src/tim.c
+CubeMX_Config/Src/usart.c
+CubeMX_Config/Drivers/CMSIS/DSP/Include/arm_math.h
+
+CubeMX_Config/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c
+CubeMX_Config/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c
+CubeMX_Config/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c
+''')
+
+# 包含CMSIS DSP库的所有源文件
+# src += Glob('CubeMX_Config/Drivers/CMSIS/DSP/Source/*.c')  # 删除或注释掉此行以去除 DSP 库
+
+# 依赖SD卡时添加端口文件
+if GetDepend(['BSP_USING_SDCARD']):
+    src += Glob('ports/sdcard_port.c')
+
+# 包含路径
+path = [cwd]
+path += [cwd + '/CubeMX_Config/Inc']
+path += [cwd + 'CubeMX_Config/Src']
+path += [cwd + '/ports']
+path += [cwd + '/CubeMX_Config/Drivers/CMSIS/Include']
+path += [cwd + '/CubeMX_Config/Drivers/CMSIS/DSP/Include']
+path += [cwd + '/CubeMX_Config/Drivers/CMSIS/DSP/Include']
+
+# 启动文件路径
+startup_path_prefix = SDK_LIB
+
+if rtconfig.PLATFORM in ['gcc']:
+    src += [startup_path_prefix + '/STM32F4xx_HAL/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f427xx.s']
+elif rtconfig.PLATFORM in ['armcc', 'armclang']:
+    src += [startup_path_prefix + '/STM32F4xx_HAL/CMSIS/Device/ST/STM32F4xx/Source/Templates/arm/startup_stm32f427xx.s']
+elif rtconfig.PLATFORM in ['iccarm']:
+    src += [startup_path_prefix + '/STM32F4xx_HAL/CMSIS/Device/ST/STM32F4xx/Source/Templates/iar/startup_stm32f427xx.s']
+
+CPPDEFINES = ['STM32F427xx']
+group = DefineGroup('Drivers', src, depend=[''], CPPPATH=path, CPPDEFINES=CPPDEFINES)
+
+# 删除 DSP 库的链接选项
+# LINKFLAGS = ['-lm']  # 可选择去掉
+# LIBPATH = [cwd + '/DSP/Lib']  # 可选择去掉
+# LIBS = ['arm_cortexM4lf_math']  # 可选择去掉
+
+# 更新环境（去除了 DSP 库相关配置）
+# env.Append(LINKFLAGS=LINKFLAGS, LIBPATH=LIBPATH, LIBS=LIBS)
+
+Return('group')

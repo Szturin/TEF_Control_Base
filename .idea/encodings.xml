@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/CMakeLists.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_APP/PID/controller.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_APP/PID/pid.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_APP/PID/pid.h" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_APP/PID/pid_test_app.h" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_APP/function/RM_Define.h" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_APP/function/structure_typedef.h" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_APP/judge/JudgeMent.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_APP/motor/MotorControl_app.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_APP/motor/MotorControl_app.h" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_APP/motor/Motor_canReceive.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_APP/ringbuffer/ringbuffer.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_BSP/uart/bsp_JY901.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_BSP/uart/bsp_remoter_uart.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_BSP/uart/bsp_remoter_uart.h" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_TASK/chassic/chassis_task.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_TASK/chassic/chassis_task.h" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_TASK/cmd_parse/usart_task.h" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_TASK/gimbal/gimbal_task.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_TASK/gimbal/gimbal_task.h" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_TASK/shoot/shoot_task.c" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/applications/RM_TASK/shoot/shoot_task.h" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/board/CubeMX_Config/Src/stm32f4xx_it.c" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/board/CubeMX_Config/Src/usart.c" charset="GBK" />
+    <file url="PROJECT" charset="GBK" />
+  </component>
+</project>
