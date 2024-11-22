@@ -1,5 +1,5 @@
 #include "applications/RM_BSP/bsp_system.h"
-#include "chassic/chassis.h"
+
 /* defined the LED_G pin: PF14 */
 #define LED0_PIN    GET_PIN(F, 14)
 #define LED1_PIN    GET_PIN(E, 11)
@@ -39,10 +39,10 @@ static void thread2_entry(void  *parameter)
 
 /*线程 云台 入口函数*/
 static void gimbal_entry(void  *parameter){
-    gimbal_init();
+
     while(1){
         gimbaltask();
-        //my_printf(&huart2,"云台运行中...\r\n");scxxsc
+        //my_printf(&huart2,"云台运行中...\r\n");
         rt_thread_mdelay(5);
     }
 }
@@ -51,13 +51,12 @@ static void gimbal_entry(void  *parameter){
 static void chassis_entry(void  *parameter){
     while(1){
         chassistask();
-        //ChassisTask();
         //my_printf(&huart2,"底盘运行中...\r\n");
         rt_thread_mdelay(5);
     }
 }
 
-/*线程 射击 入口函数*/
+/*线程 火控 入口函数*/
 static void shoot_entry(void  *parameter){
     while(1){
         shoottask();
@@ -66,17 +65,18 @@ static void shoot_entry(void  *parameter){
     }
 }
 
-/*线程 射击 入口函数*/
+/*线程 串口 入口函数*/
 static void uart_entry(void  *parameter){
     while(1){
         uart_proc();
-        rt_thread_mdelay(5);// tip：如果这里周期设置过长，时间片又只有10ms,没有成功解析就退出了线程
+        rt_thread_mdelay(10);// tip：如果这里周期设置过长，时间片又只有10ms,没有成功解析就退出了线程
     }
 }
 
 int main(void)
 {
     HAL_Init();
+    gimbal_init();
     SystemClock_Config();
     MX_GPIO_Init();
     MX_DMA_Init();
@@ -107,7 +107,7 @@ int main(void)
     /*创建线程1*/
     tid1 = rt_thread_create("thread1",
                             thread1_entry,RT_NULL,
-                            2048,20, 10);
+                            2048,20, 5);
 
     /*创建线程2*/
     tid2 = rt_thread_create("thread2",
@@ -118,7 +118,7 @@ int main(void)
 
     /*启动线程*/
     //if(tid1 != RT_NULL){rt_thread_startup(tid1);}//线程1不为空，激活线程
-    //if(tid2 != RT_NULL){rt_thread_startup(tid2);}//线程2不为空，激活线程
+    //if(tid2 != RT_NULL){rt_thread_startup(/tid2);}//线程2不为空，激活线程
     if(thread_gimbal != RT_NULL){rt_thread_startup(thread_gimbal);}
     if(thread_chassis != RT_NULL){rt_thread_startup(thread_chassis);}
     if(thread_shoot != RT_NULL){rt_thread_startup(thread_shoot);}
@@ -131,15 +131,16 @@ void RM_thread_create(void)
     thread_gimbal = rt_thread_create("thread3",
                                      gimbal_entry,
                                      RT_NULL,
-                                     4096,20,10);
+                                     4096,15,20);
+
     thread_chassis = rt_thread_create("thread4",
                                       chassis_entry,
                                       RT_NULL,
-                                      4096,20,10);
+                                      4096,16,20);
     thread_shoot = rt_thread_create("thread5",
                                       shoot_entry,
                                       RT_NULL,
-                                      4096,20,10);
+                                      4096,15,10);
     thread_uart = rt_thread_create("thread6",
                                    uart_entry,
                                    RT_NULL,

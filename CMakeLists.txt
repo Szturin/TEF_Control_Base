@@ -25,16 +25,8 @@ SET(CMAKE_CXX_STANDARD 14)
 PROJECT(rtthread C CXX ASM)
 INCLUDE_DIRECTORIES(
 	applications/RM_APP
-		applications/RM_APP/PID
-		applications/RM_APP/motor
-		applications/RM_APP/message_center
 	applications/RM_TASK
 	applications/RM_BSP
-		applications/RM_BSP/can
-		applications/RM_BSP/dwt
-	packages/CMSIS-DSP-latest/Include
-	packages/CMSIS-DSP-latest/Include/dsp
-	packages/CMSIS-DSP-latest/PrivateInclude
 	rt-thread/components/libc/compilers/common/include
 	rt-thread/components/libc/compilers/newlib
 	rt-thread/libcpu/arm/common
@@ -70,20 +62,20 @@ ADD_DEFINITIONS(
 )
 
 SET(PROJECT_SOURCES
-		applications/RM_TASK/cmd_parse/usart_task.c
-		applications/RM_APP/imu/JY901USE.h
-		applications/RM_TASK/gimbal/gimbal_task.c
-		applications/RM_BSP/can/bsp_can.c
-		applications/RM_APP/judge/JudgeMent.c
-		applications/RM_BSP/uart/bsp_JY901.c
-        applications/RM_TASK/chassic/chassis_task.c
-		applications/RM_APP/ringbuffer/ringbuffer.c
-		applications/RM_APP/PID/pid_test_app.c
-	applications/RM_BSP/bsp_system.h
-		applications/RM_BSP/uart/bsp_remoter_uart.c
-		applications/RM_APP/PID/pid.c
+	applications/RM_APP/imu/JY901USE.h
+	applications/RM_BSP/uart/bsp_remoter_uart.c
+	applications/RM_BSP/can/bsp_can.c
+	applications/RM_APP/judge/JudgeMent.c
+	applications/RM_BSP/uart/bsp_JY901.c
+	applications/RM_TASK/cmd_parse/usart_task.c
+	applications/RM_TASK/shoot/shoot_task.c
 	applications/main.c
-		applications/RM_TASK/shoot/shoot_task.c
+	applications/RM_TASK/gimbal/gimbal_task.c
+	applications/RM_APP/PID/pid_test_app.c
+	applications/RM_APP/PID/pid.c
+	applications/RM_APP/ringbuffer/ringbuffer.c
+	applications/RM_TASK/chassic/chassis_task.c
+	applications/RM_BSP/bsp_system.h
 	rt-thread/components/libc/compilers/common/cctype.c
 	rt-thread/components/libc/compilers/common/cstdio.c
 	rt-thread/components/libc/compilers/common/cstdlib.c
@@ -124,10 +116,10 @@ SET(PROJECT_SOURCES
 	libraries/HAL_Drivers/drv_common.c
 	libraries/HAL_Drivers/drv_gpio.c
 	libraries/HAL_Drivers/drv_usart.c
-	rt-thread/components/finsh/cmd.c
-	rt-thread/components/finsh/shell.c
-	rt-thread/components/finsh/msh_parse.c
 	rt-thread/components/finsh/msh.c
+	rt-thread/components/finsh/shell.c
+	rt-thread/components/finsh/cmd.c
+	rt-thread/components/finsh/msh_parse.c
 	rt-thread/src/clock.c
 	rt-thread/src/components.c
 	rt-thread/src/device.c
@@ -141,53 +133,23 @@ SET(PROJECT_SOURCES
 	rt-thread/src/scheduler.c
 	rt-thread/src/thread.c
 	rt-thread/src/timer.c
-	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cec.c
-	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c
-	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_crc.c
-	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c
-	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c
+	libraries/STM32F4xx_HAL/CMSIS/Device/ST/STM32F4xx/Source/Templates/system_stm32f4xx.c
+	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c
+	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cryp.c
 	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c
+	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cec.c
+	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cryp_ex.c
+	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_usart.c
+	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c
+	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c
+	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c
 	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c
+	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c
 	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c
 	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rng.c
-	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c
-	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c
-	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_usart.c
-	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c
-	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c
-	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cryp_ex.c
-	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cryp.c
-	libraries/STM32F4xx_HAL/CMSIS/Device/ST/STM32F4xx/Source/Templates/system_stm32f4xx.c
-        applications/RM_BSP/can/bsp_can_demo.c
-		applications/RM_BSP/can/bsp_can_demo.h
-		applications/RM_BSP/can/bsp_can_demo.h
-		applications/RM_APP/message_center/message_center.c
-		applications/RM_APP/message_center/message_center.c
-		applications/RM_APP/message_center/message_center.h
-		applications/RM_APP/PID/controller.c
-		applications/RM_APP/general_def.h
-		applications/RM_APP/motor/DJImotor/dji_motor.h
-		applications/RM_APP/motor/DJImotor/dji_motor.c
-		applications/RM_APP/daemon/daemon.c
-		applications/RM_APP/daemon/daemon.h
-		applications/RM_APP/motor/motor_def.h
-		applications/RM_APP/PID/controller.h
-		applications/RM_BSP/dwt/bsp_dwt.h
-		applications/RM_BSP/dwt/bsp_dwt.c
-		applications/RM_TASK/robot_def.h
-		applications/RM_APP/master_machine/master_process.c
-		applications/RM_APP/master_machine/master_process.c
-		applications/RM_APP/master_machine/master_process.h
-		applications/RM_APP/master_machine/seasky_protocol.c
-		applications/RM_APP/master_machine/seasky_protocol.c
-		applications/RM_APP/algorithm/crc16.c.h
-		applications/RM_APP/algorithm/crc16.h
-		applications/RM_APP/algorithm/crc16.h
-		applications/RM_APP/algorithm/crc8.c
-		applications/RM_APP/algorithm/crc8.h
-		applications/RM_APP/master_machine/seasky_protocol.h
-		applications/RM_TASK/chassic/chassis.c
-		applications/RM_TASK/chassic/chassis.h
+	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_crc.c
+	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c
+	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c
 )
 
 LINK_DIRECTORIES(

@@ -137,11 +137,11 @@ void gimbal_axis_control(void)//以云台为轴的控制模式，即小陀螺
     vx_set=(float)rc.remote.ch3*CHASSIS_VX_RC_SEN;
     vy_set=(float)rc.remote.ch4*CHASSIS_VY_RC_SEN;
     //chassis_control.wz_set=3;
-    chassis_control.wz_set=0;
+    chassis_control.wz_set=5;
     sin_yaw = arm_sin_f32(chassis_motor_parameter.chassis_relative_angle);  //sinθ
     cos_yaw = arm_cos_f32(chassis_motor_parameter.chassis_relative_angle);  //cosθ逻辑门判断，比平常的sin和cos更快，能够实现小陀螺
-    chassis_control.vx_set = cos_yaw * vx_set + sin_yaw * vy_set;
-    chassis_control.vy_set = -sin_yaw * vx_set + cos_yaw * vy_set;
+    chassis_control.vx_set = cos_yaw * vx_set - sin_yaw * vy_set;
+    chassis_control.vy_set = sin_yaw * vx_set + cos_yaw * vy_set;
 }
 
 void chassis_axis_control(void)//以底盘为轴的控制模式，即普通模式
@@ -196,6 +196,7 @@ void mackenaham_calc(fp32 vx_set,fp32 vy_set,fp32 wz_set)//麦轮运动学解算
 
 //@param2：MOTORDATA1.speed 电条反馈过来的速度，即当前速度
 //@param3: chassis_control.wheel_speed[0] 电机的期望速度，由上面函数计算而来，即目标速度
+//速度环
 void PID_Adjust(void)//PID调整
 {
     chassis_motor_data.targrt_1 = (short)chassis_motor1_init.Calc(&chassis_motor1_init,MOTORDATA1.speed,chassis_control.wheel_speed[0]);

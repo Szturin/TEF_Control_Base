@@ -22,6 +22,8 @@ motor_measure_t DATAGIMBALPITCH_2;
 motor_measure_t DATATRIGGER;
 int flag_num = 5;
 
+#define CAN_SEND_TIMEOUT 10 // 超时时间 10 个 tick
+
 void can_filter_init(void)  //can掩码器
 {
 
@@ -69,7 +71,6 @@ static uint8_t              chassis_can_send_data[8];
   * @retval         none
   */
 
-/*
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
     CAN_RxHeaderTypeDef rx_header;
@@ -120,7 +121,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 
     }
 }
-*/
 
 void Driver_MOTOR_ReadData(motor_measure_t *MOTOR_Data,uint8_t *rx_data)
 {
@@ -142,6 +142,7 @@ void Driver_MOTOR_ReadData(motor_measure_t *MOTOR_Data,uint8_t *rx_data)
 void CAN_cmd_gimbal(CANSend_TypeDef *motor)
 {
     uint32_t send_mail_box;
+    rt_tick_t start_tick = rt_tick_get();//记录当前时间戳
     gimbal_tx_message.StdId = CAN_GIMBAL_ID;
     gimbal_tx_message.IDE = CAN_ID_STD;
     gimbal_tx_message.RTR = CAN_RTR_DATA;
@@ -154,13 +155,23 @@ void CAN_cmd_gimbal(CANSend_TypeDef *motor)
     gimbal_can_send_data[5] = (uint8_t)(motor->targrt_3);
     gimbal_can_send_data[6] = (uint8_t)(motor->targrt_4>>8);
     gimbal_can_send_data[7] = (uint8_t)(motor->targrt_4);
-    HAL_CAN_AddTxMessage(&GIMBAL_CAN, &gimbal_tx_message, gimbal_can_send_data, &send_mail_box);
 
+    /*超时退出，防止阻塞进程*/
+
+
+    while(HAL_CAN_GetTxMailboxesFreeLevel(&hcan2)==0){
+        if(rt_tick_get() - start_tick >= 20){
+            return;
+        }
+    }
+
+    HAL_CAN_AddTxMessage(&GIMBAL_CAN, &gimbal_tx_message, gimbal_can_send_data, &send_mail_box);
 }
 
 void CAN_cmd_shoot(CANSend_TypeDef *motor)
 {
     uint32_t send_mail_box;
+    rt_tick_t start_tick = rt_tick_get();//记录当前时间戳
     shoot_tx_message.StdId = CAN_SHOOT_ID;
     shoot_tx_message.IDE = CAN_ID_STD;
     shoot_tx_message.RTR = CAN_RTR_DATA;
@@ -173,8 +184,17 @@ void CAN_cmd_shoot(CANSend_TypeDef *motor)
     shoot_can_send_data[5] = (uint8_t)(motor->targrt_3);
     shoot_can_send_data[6] = (uint8_t)(motor->targrt_4>>8);
     shoot_can_send_data[7] = (uint8_t)(motor->targrt_4);
+
+    /*超时退出，防止阻塞进程*/
+
+    while(HAL_CAN_GetTxMailboxesFreeLevel(&hcan2)==0){
+        if(rt_tick_get() - start_tick >= 20){
+            return;
+       }
+    }
+
+
     HAL_CAN_AddTxMessage(&SHOOT_CAN, &shoot_tx_message, shoot_can_send_data, &send_mail_box);
-    HAL_CAN_AddTxMessage(&CHASSIS_CAN, &shoot_tx_message, shoot_can_send_data, &send_mail_box);
 
 }
 
@@ -197,7 +217,7 @@ void CAN_cmd_shoot(CANSend_TypeDef *motor)
 void CAN_cmd_chassis(CANSend_TypeDef *motor)
 {
     uint32_t send_mail_box;
-    uint32_t Flag = 0;
+    rt_tick_t start_tick = rt_tick_get();//记录当前时间戳
 
     chassis_tx_message.StdId = CAN_CHASSIS_ID;
     chassis_tx_message.IDE = CAN_ID_STD;
@@ -211,10 +231,16 @@ void CAN_cmd_chassis(CANSend_TypeDef *motor)
     chassis_can_send_data[5] = (uint8_t)(motor->targrt_3);
     chassis_can_send_data[6] = (uint8_t)(motor->targrt_4>>8);
     chassis_can_send_data[7] = (uint8_t)(motor->targrt_4);
-    while(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1)==0);
+
+    /*超时退出，防止阻塞进程*/
+    while(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1)==0){
+        if(rt_tick_get() - start_tick >= 20){
+            return;
+        }
+    }
+
 
     HAL_CAN_AddTxMessage(&CHASSIS_CAN, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
-
 }
 
 /**

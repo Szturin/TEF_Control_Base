@@ -40,9 +40,6 @@ uint8_t  Judge_Buffer[ JUDGE_BUFFER_LEN ] = {0};  //裁判系统发过来的数据暂存在这
 extern int16_t move_speed;//键盘通道下的移动速度
 
 
-
-
-
 uint8_t Judgment_data_Get(uint8_t *Judgment_data)  //收裁判系统发来的数据
 {
 	uint8_t retval_tf = 0;//数据正确与否标志,每次调用读取裁判系统数据函数都先默认为错误
