@@ -33,6 +33,7 @@ typedef struct
         int16_t ch2;
         int16_t ch3;
         int16_t ch4;//·½ÏòÒ¡¸Ë
+        int16_t wheel;//²¦ÂÖ
 
         uint8_t sw1;
         uint8_t sw2;//²¦Æ¬

@@ -76,11 +76,12 @@
 	.RST  = &PID_Reset,\
 }
 
-PID_TypeDef gimbal_pitch_angle_init = pitch_angle_pid;//pitch串级pid
-PID_TypeDef gimbal_pitch_speed_init = pitch_speed_pid;
-PID_TypeDef gimbal_yaw_angle_init = yaw_angle_pid;//yaw串级pid
-PID_TypeDef gimbal_yaw_speed_init = yaw_speed_pid;
+static PID_TypeDef gimbal_pitch_angle_init = pitch_angle_pid;//pitch串级pid
+static PID_TypeDef gimbal_pitch_speed_init = pitch_speed_pid;
+static PID_TypeDef gimbal_yaw_angle_init = yaw_angle_pid;//yaw串级pid
+static PID_TypeDef gimbal_yaw_speed_init = yaw_speed_pid;
 
+/*全局变量 warning ！！！*/
 extern chassis_motor_parameter_t chassis_motor_parameter;
 extern CANSend_TypeDef  gimbal_motor_data;
 extern motor_measure_t DATAGIMBALYAW;
@@ -88,41 +89,45 @@ extern motor_measure_t DATAGIMBALPITCH_1;
 extern motor_measure_t DATAGIMBALPITCH_2;
 
 
-Gim_Motor_t yaw;
-Gim_Motor_t pit_1;
-Gim_Motor_t pit_2;
+static Gim_Motor_t yaw;
+static Gim_Motor_t pit_1;
+static Gim_Motor_t pit_2;
+
+/*全局变量 warning ！！！*/
 CANSend_TypeDef  gimbal_motor_data;
 
+/*全局变量 warning ！！！*/
 extern User_USART JY901_data; //维特陀螺仪数据
-int16_t remote_mode= 2;
-int16_t imu_flag=0;
-int16_t yaw_flag=0;
 
-short yaw_control_target_speed;//陀螺仪自稳目标速度
-uint8_t coditional_constant=0;//陀螺仪初始角获取判断常数
-int16_t space_initial_angle=0;//陀螺仪初始角
-int16_t deflective_angle;//陀螺仪差角
+uint8_t remote_mode= 2;
+static int16_t imu_flag=0;
+static int16_t yaw_flag=0;
 
-uint8_t initial_angle_flag=0;//初始机械角获取判断常数
-int16_t initial_angle=0;//初始机械角
-int16_t initial_angle_1=0;
+static short yaw_control_target_speed;//陀螺仪自稳目标速度
+static uint8_t coditional_constant=0;//陀螺仪初始角获取判断常数
+static int16_t space_initial_angle=0;//陀螺仪初始角
+static int16_t deflective_angle;//陀螺仪差角
 
-float pitch_target_angle=0.0f;
-float pitch_target_speed=0.0f;
-float pitch_now_angle=0.0f;
+static uint8_t initial_angle_flag=0;//初始机械角获取判断常数
+static int16_t initial_angle=0;//初始机械角
+static int16_t initial_angle_1=0;
 
-short yaw_motor_output;     //底盘电机输出
+static float pitch_target_angle=0.0f;
+static float pitch_target_speed=0.0f;
+static float pitch_now_angle=0.0f;
 
-float turn_angle;
+static short yaw_motor_output;     //底盘电机输出
 
-uint8_t reload_flag=0;//填弹判断
+static float turn_angle;
 
-uint16_t flag=0;//填弹判断
+static uint8_t reload_flag=0;//填弹判断
 
-int16_t last_x;
-int16_t last_y;
-int16_t last_z;
-int16_t mousemove_flag=0;
+static uint16_t flag=0;//填弹判断
+
+static int16_t last_x;
+static int16_t last_y;
+static int16_t last_z;
+static int16_t mousemove_flag=0;
 
 double map(double x, double min,double max, double min_t,double max_t)//将0到8191转化为-pi到pi
 {
@@ -201,13 +206,6 @@ void gimbal_data_refresh(void)
 *********************************************/
 void gimbal_remote_calc(void)
 {
-    /*小陀螺自瞄*/
-    if(rc.remote.sw2 == 2){
-        remote_mode = 3;
-    }
-    else{
-        remote_mode = 2;
-    }
 
     if(remote_mode==1)
     {

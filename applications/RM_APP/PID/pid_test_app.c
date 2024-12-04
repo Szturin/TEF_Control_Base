@@ -1,5 +1,6 @@
 #include "pid_test_app.h"
 
+/*全局变量 warning ！！！*/
 PID_Params_t PID_Test;
 
 // 初始化PID参数

@@ -150,6 +150,9 @@ SET(PROJECT_SOURCES
 	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_crc.c
 	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c
 	libraries/STM32F4xx_HAL/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c
+        applications/RM_APP/algorithm/crc8.c
+		applications/RM_APP/algorithm/crc16.c
+		applications/RM_APP/message_center/message_center.c
 )
 
 LINK_DIRECTORIES(

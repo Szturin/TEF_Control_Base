@@ -78,9 +78,8 @@ typedef struct
     float deflective_angle;
 }calc_info_t;
 
-
-
+/*全局变量 warning ！！！*/
 extern shoot_info_t shoot_info;
 extern uint8_t keyboard_flag;
-
+extern uint8_t remote_mode;
 #endif

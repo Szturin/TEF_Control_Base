@@ -1,6 +1,5 @@
 #include "usart_task.h"
 
-uint8_t uart2_rx_buffer[128]={0};//串口2接收缓冲区
 uint8_t uart2_rx_dma_buffer[1024]={0};//串口2DMA缓冲区
 
 ringbuffer_t uart2_rb; //定义ringbuffer_t类型结构体变量

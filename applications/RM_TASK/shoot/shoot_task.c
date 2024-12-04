@@ -1,21 +1,25 @@
 #include "shoot_task.h"
 
+/*全局变量 warning ！！！*/
 extern motor_measure_t RIGHTMOTORDATA;    // 右摩擦轮
 extern motor_measure_t LEFTMOTORDATA;   // 左摩擦轮
 extern motor_measure_t DATATRIGGER;     // 拨弹盘电机
 extern CANSend_TypeDef shoot_motor_data;
+
+/*全局变量 warning ！！！*/
 CANSend_TypeDef shoot_motor_data;
 
-SHO_Motor_t left_friction;
-SHO_Motor_t right_friction;
-SHO_Motor_t trigger;
+static SHO_Motor_t left_friction;
+static SHO_Motor_t right_friction;
+static SHO_Motor_t trigger;
 
-int16_t give_flag;//获取初始值判断
-float shoot_current_angle;//角度转化的瞬时角
-int16_t stop_time = 0;//卡弹时间
+static int16_t give_flag;//获取初始值判断
+static float shoot_current_angle;//角度转化的瞬时角
+static int16_t stop_time = 0;//卡弹时间
+/*全局变量 warning ！！！*/
 int16_t shoot_mode = 0;//拨弹模式
-int16_t stop_continue_time = 0;
-uint8_t shoot_flag = 0;//摩擦轮模式判断
+static int16_t stop_continue_time = 0;
+static uint8_t shoot_flag = 0;//摩擦轮模式判断
 
 
 int16_t ka_time = 0;
@@ -88,22 +92,45 @@ void shoot_remote_calc(void)
 {
     switch (rc.remote.sw1)//左上开关——>控制三种模式
     {
-    case 1://左上开关gps——>底盘普通
-        shoot_mode = STOP;
-        break;
-    case 3://左上开关att1——>键盘通道
-        if (shoot_mode != BACK)
-        {
-            shoot_mode = SPEED_1;
-        }
-        break;
-    case 2://左上开关att2——>随动
-        if (shoot_mode != BACK)
-        {
-            shoot_mode = SPEED_2;
-        }
-        break;
+    /*
+        case 1://左上开关gps——>底盘普通
+            shoot_mode = STOP;
+            break;
+        case 3://左上开关att1——>键盘通道
+            if (shoot_mode != BACK)
+            {
+                shoot_mode = SPEED_1;
+            }
+            break;
+        case 2://左上开关att2——>随动
+            if (shoot_mode != BACK)
+            {
+                shoot_mode = SPEED_2;
+            }
+            break;
+    */
+        case 1://左上开关gps——> 停止射击
+            remote_mode = 3;//云台自由
+            shoot_mode = STOP;
+            break;
+        case 3://左上开关att1——> 自由射击
+            remote_mode = 3;//云台自由
+            if (shoot_mode != BACK)
+            {
+
+                shoot_mode = SPEED_1;
+            }
+            break;
+        case 2://左上开关att2——> 自动瞄准
+            remote_mode = 3;//**云台自瞄辅助控制**
+            if (shoot_mode != BACK)
+            {
+
+                shoot_mode = SPEED_2;
+            }
+            break;
     }
+
     if (shoot_mode == STOP)
     {
         stop_feed();
@@ -120,6 +147,7 @@ void shoot_remote_calc(void)
             {
                 stop_time++;
             }
+
             if (stop_time == 1)
             {
                 shoot_mode = BACK;
@@ -136,13 +164,14 @@ void shoot_remote_calc(void)
         }
     }
 
+
 }
 
 void speed1_feed(void)//定速喂弹
 {
     left_friction.target_speed = 3.5;
     right_friction.target_speed = -3.5;
-    trigger.target_speed = -0.3;
+    trigger.target_speed = -0.3;//转盘速度
 
     shoot_motor_data.targrt_1 = left_friction.send_data;
     shoot_motor_data.targrt_2 = right_friction.send_data;
@@ -151,10 +180,19 @@ void speed1_feed(void)//定速喂弹
 
 void speed2_feed(void)//定角喂弹
 {
+    //目标速度
+
+    /*
     left_friction.target_speed = 3.5;
     right_friction.target_speed = -3.5;
-    trigger.target_speed = -0.35;
+    trigger.target_speed = -0.35;//供弹速度，转盘
+    */
 
+    left_friction.target_speed=(float)(abs(rc.remote.wheel))/660.0f*3.5f;//归一化
+    right_friction.target_speed=-(float)(abs(rc.remote.wheel))/660.0f*3.5f;//归一化
+    trigger.target_speed = (float)(abs(rc.remote.wheel))/660.0f*0.35f;//归一化
+
+    //设置速度
     shoot_motor_data.targrt_1 = left_friction.send_data;
     shoot_motor_data.targrt_2 = right_friction.send_data;
     shoot_motor_data.targrt_3 = trigger.send_data;
@@ -167,10 +205,12 @@ void back_feed(void)//卡弹处理（拨弹盘电机反转）
         shoot_motor_data.targrt_3 = 700;
         stop_continue_time++;
     }
+
     if (stop_continue_time == 10)
     {
         shoot_flag = 1;
     }
+
     if (shoot_flag == 1)
     {
         shoot_flag = 0;
@@ -217,7 +257,7 @@ void shoot_calc_task(void)
      trigger.target_speed=-0.15;
 
      shoot_motor_data.targrt_1=left_friction.send_data;
-   shoot_motor_data.targrt_2=right_friction.send_data;
+     shoot_motor_data.targrt_2=right_friction.send_data;
      shoot_motor_data.targrt_3=trigger.send_data;
      */
 }

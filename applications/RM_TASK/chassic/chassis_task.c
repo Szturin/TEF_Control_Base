@@ -37,23 +37,23 @@
 	.RST  = &PID_Reset,\
 }
 
+static float sin_yaw=0,cos_yaw=0;
 
+static PID_TypeDef chassis_motor1_init = chassic_pid; //底盘电机pid
+static PID_TypeDef chassis_motor2_init = chassic_pid;
+static PID_TypeDef chassis_motor3_init = chassic_pid;
+static PID_TypeDef chassis_motor4_init = chassic_pid;
 
-float sin_yaw=0,cos_yaw=0;
+static PID_TypeDef chassis_follow_init = chassic_follow_pid;
 
-PID_TypeDef chassis_motor1_init = chassic_pid; //底盘电机pid
-PID_TypeDef chassis_motor2_init = chassic_pid;
-PID_TypeDef chassis_motor3_init = chassic_pid;
-PID_TypeDef chassis_motor4_init = chassic_pid;
-
-PID_TypeDef chassis_follow_init = chassic_follow_pid;
-
-
+/*全局变量 warning ！！！*/
 extern PID_TypeDef   gimbal_yaw_init;
 
-chassis_ctrl_info_t chassis_control;
-chassis_ctrl_info_t key_chassic;
+static chassis_ctrl_info_t chassis_control;
+static chassis_ctrl_info_t key_chassic;
 chassis_motor_parameter_t chassis_motor_parameter; //底盘参数
+
+/*全局变量 warning ！！！*/
 extern motor_measure_t MOTORDATA1;				//底盘motor 1数据
 extern motor_measure_t MOTORDATA2;				//底盘motor 2数据
 extern motor_measure_t MOTORDATA3;				//底盘motor 3数据
@@ -61,17 +61,20 @@ extern motor_measure_t MOTORDATA4;				//底盘motor 4数据
 extern CANSend_TypeDef chassis_motor_data; //底盘发送数据轴电机
 extern motor_measure_t DATAGIMBALYAW;			//云台yaw
 
-fp32 vx_set;
-fp32 vy_set;
-fp32 wz_set;
-fp32 last_set;
-fp32 wz_target_set;
+static fp32 vx_set;
+static fp32 vy_set;
+static fp32 wz_set;
+static fp32 last_set;
+static fp32 wz_target_set;
 
+/*全局变量 warning ！！！*/
 CANSend_TypeDef chassis_motor_data;
 
+/*全局变量 warning ！！！*/
 uint8_t keyboard_flag=0;//键盘通道的激活判断
-int16_t move_mode;//键盘通道下的小车模式
-int16_t coolspeed=0;
+
+static int16_t move_mode;//键盘通道下的小车模式
+static int16_t coolspeed=0;
 
 void chassistask()
 {

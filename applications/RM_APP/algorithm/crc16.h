@@ -1,5 +1,5 @@
-#ifndef __CRC16_H
-#define __CRC16_H
+#ifndef CRC16_H
+#define CRC16_H
 #include "main.h"
 
 #define CRC_START_16 0xFFFF

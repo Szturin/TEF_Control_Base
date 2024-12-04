@@ -1,13 +1,15 @@
 #include "imu/JY901USE.h"
 
+/*全局变量 warning ！！！*/
 extern UART_HandleTypeDef huart8;
+/*全局变量 warning ！！！*/
 User_USART JY901_data;
 
-struct SAcc stcAcc;
+static struct SAcc stcAcc;
 
-struct SGyro stcGyro;
+static struct SGyro stcGyro;
 
-struct SAngle stcAngle;
+static struct SAngle stcAngle;
 
 
 void User_USART_Init(User_USART *Data)

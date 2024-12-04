@@ -7,12 +7,8 @@
 void uart_proc(void);
 int My_printf(UART_HandleTypeDef *huart, const char *format, ...);
 
-
-extern uint8_t uart2_rx_buffer[128];
 extern uint8_t uart2_rx_dma_buffer[1024];
 extern uint8_t uart2_read_buffer[1024];
-
-
 
 //接收上下文结构体
 typedef struct {

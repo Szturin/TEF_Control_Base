@@ -1,6 +1,8 @@
 #include "bsp_remoter_uart.h"
 
-uint8_t dbus_buf[DBUS_BUFLEN];
+static uint8_t dbus_buf[DBUS_BUFLEN];
+
+/*全局变量 warning ！！！*/
 rc_info_t rc;
 
 //使用dma而不使用中断的情况下从uart接收数据
@@ -55,19 +57,18 @@ void rc_callback_handler(rc_info_t *rc, uint8_t *buff)
     rc->remote.ch3 -= 1024;
     rc->remote.ch4 = (buff[4] >> 1 | buff[5] << 7) & 0x07FF;//摇杆数据解析
     rc->remote.ch4 -= 1024;
-
     rc->remote.sw1 = ((buff[5] >> 4) & 0x000C) >> 2;
     rc->remote.sw2 = (buff[5] >> 4) & 0x0003;//拨片数据解析
+    rc->remote.wheel = (buff[16] | buff[17] << 8) - 1024;//拨轮数据解析
 
-    rc->mouse.x = (buff[6] | (buff[7] << 8));
+    rc->mouse.x = (buff[6] | (buff[7] << 8));//鼠标移动数据解析
     rc->mouse.y = (buff[8] | (buff[9] << 8));
-    rc->mouse.z = (buff[10] | (buff[11] << 8));//鼠标移动数据解析
+    rc->mouse.z = (buff[10] | (buff[11] << 8));
+    rc->mouse.press_l = buff[12];//鼠标左右键
+    rc->mouse.press_r = buff[13];
 
-    rc->mouse.press_l = buff[12];
-    rc->mouse.press_r = buff[13];//鼠标左右键
-
-    rc->key.val = (buff[14] | (buff[15] << 8));
-    rc->key.w = (rc->key.val & key_w) >> 0;
+    rc->key.val = (buff[14] | (buff[15] << 8));//按键值
+    rc->key.w = (rc->key.val & key_w) >> 0;//键盘按键解析
     rc->key.s = (rc->key.val & key_s) >> 1;
     rc->key.a = (rc->key.val & key_a) >> 2;
     rc->key.d = (rc->key.val & key_d) >> 3;
@@ -82,7 +83,7 @@ void rc_callback_handler(rc_info_t *rc, uint8_t *buff)
     rc->key.x = (rc->key.val & key_x) >> 12;
     rc->key.c = (rc->key.val & key_c) >> 13;
     rc->key.v = (rc->key.val & key_v) >> 14;
-    rc->key.b = (rc->key.val & key_b) >> 15;//键盘按键
+    rc->key.b = (rc->key.val & key_b) >> 15;
 
     //摇杆最大值减去1024后，变为660，如果超过660，则说明出现异常
     if ((abs(rc->remote.ch1) > 660) || (abs(rc->remote.ch1) > 660) || (abs(rc->remote.ch3) > 660) || (abs(rc->remote.ch4) > 660))
@@ -167,7 +168,6 @@ void uart_receive_handler(UART_HandleTypeDef *huart)
     }
 }
 
-
 void dbus_uart_init(void)
 {
     __HAL_UART_CLEAR_IDLEFLAG(&DBUS_HUART); //清楚uart的空闲标志位，以便于进入下一个周期
@@ -175,7 +175,6 @@ void dbus_uart_init(void)
 
     uart_receive_dma_no_it(&DBUS_HUART, dbus_buf, DBUS_MAX_LEN);
 }
-
 
 int fputc(int ch, FILE *f)
 {
