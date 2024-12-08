@@ -1,34 +1,42 @@
 #include "chassis_task.h"
 
 /***************************************PID调参*********************************************/
+/*PID初始参数*/
+
+/*
+.Kp = 5000.0f, \
+	.Ki = 1.0f,\
+	.Kd = 10.0f,\
+    */
+//车的最大速度为
 #define chassic_pid \
 {\
-	.Kp = 4000.0f, \
-	.Ki = 10.0f,\
-	.Kd = 0.0f,\
+	.Kp = 16600.0f, \
+	.Ki = 2850.0f,\
+	.Kd = 2000.0f,\
 	.Output_Max = 16384.0f,\
-	.DeadZone = 0.01f,\
-	.EIS_Max = 50000.0f,\
-	.EAIS_Max = 50000.0f,\
-	.Integral_Max = 2000.0f,\
+	.DeadZone = 0.0f,\
+	.EIS_Max = 200.0f,\
+	.EAIS_Max = 15000.0f,\
+	.Integral_Max = 0.0f,\
 	.Error = {0.0f,0.0f,0.0f},\
 	.Integral = 0.0f,\
 	.Output = 0.0f,\
 	.Output_Last = 0.0f,\
-	.Calc = &Position_PID,\
+	.Calc = &Incremental_PID,\
 	.RST = &PID_Reset,\
 }
 
 #define chassic_follow_pid \
 {\
-	.Kp = 17.0f,   \
-	.Ki = 0.02f,  \
-	.Kd = 375.0f,      \
-	.Output_Max = 10.0f,\
+	.Kp = 11.5f,   \
+	.Ki = 0.0f,  \
+	.Kd = 205.0f,      \
+	.Output_Max = 15.0f,\
 	.DeadZone = 0.00f,\
-	.EIS_Max = 50000.0f,\
-	.EAIS_Max = 50000.0f,\
-	.Integral_Max = 1.0f,\
+	.EIS_Max = 200.0f,\
+	.EAIS_Max = 200.0f,\
+	.Integral_Max = 20.0f,\
 	.Error = {0.0f,0.0f,0.0f},\
 	.Integral = 0.0f,\
 	.Output = 0.0f,\
@@ -40,10 +48,10 @@
 static float sin_yaw=0,cos_yaw=0;
 
 static PID_TypeDef chassis_motor1_init = chassic_pid; //底盘电机pid
+
 static PID_TypeDef chassis_motor2_init = chassic_pid;
 static PID_TypeDef chassis_motor3_init = chassic_pid;
 static PID_TypeDef chassis_motor4_init = chassic_pid;
-
 static PID_TypeDef chassis_follow_init = chassic_follow_pid;
 
 /*全局变量 warning ！！！*/
@@ -140,7 +148,7 @@ void gimbal_axis_control(void)//以云台为轴的控制模式，即小陀螺
     vx_set=(float)rc.remote.ch3*CHASSIS_VX_RC_SEN;
     vy_set=(float)rc.remote.ch4*CHASSIS_VY_RC_SEN;
     //chassis_control.wz_set=3;
-    chassis_control.wz_set=5;
+    chassis_control.wz_set=8;
     sin_yaw = arm_sin_f32(chassis_motor_parameter.chassis_relative_angle);  //sinθ
     cos_yaw = arm_cos_f32(chassis_motor_parameter.chassis_relative_angle);  //cosθ逻辑门判断，比平常的sin和cos更快，能够实现小陀螺
     chassis_control.vx_set = cos_yaw * vx_set - sin_yaw * vy_set;
@@ -150,23 +158,22 @@ void gimbal_axis_control(void)//以云台为轴的控制模式，即小陀螺
 void chassis_axis_control(void)//以底盘为轴的控制模式，即普通模式
 {
     chassis_control.wz_set=0;
-    chassis_control.vx_set=(float)rc.remote.ch3*CHASSIS_VX_RC_SEN*2.0;
-    chassis_control.vy_set=(float)rc.remote.ch4*CHASSIS_VY_RC_SEN*2.0;
+    chassis_control.vx_set=(float)rc.remote.ch3*CHASSIS_VX_RC_SEN*2;
+    chassis_control.vy_set=(float)rc.remote.ch4*CHASSIS_VY_RC_SEN*2;
 }
-
 
 void gimbal_follow_control(void)//随动模式
 {
-    chassis_control.vx_set=(float)rc.remote.ch3*CHASSIS_VX_RC_SEN*2.0;
-    chassis_control.vy_set=(float)rc.remote.ch4*CHASSIS_VY_RC_SEN*2.0;
+    chassis_control.vx_set=(float)rc.remote.ch3*CHASSIS_VX_RC_SEN*2;
+    chassis_control.vy_set=(float)rc.remote.ch4*CHASSIS_VY_RC_SEN*2;
 
     wz_set = (-chassis_follow_init.Calc(&chassis_follow_init,chassis_motor_parameter.chassis_relative_angle,-0.260));//1.0f
 
+    wz_set = wz_set * 0.95 + last_set * 0.05;//滞后更加稳定
+
     last_set = wz_set;
 
-    wz_target_set = wz_set * 0.83 + last_set * 0.17;//滞后更加稳定
-
-    chassis_control.wz_set=wz_target_set;
+    chassis_control.wz_set=wz_set;
 }
 
 
@@ -191,6 +198,7 @@ void chassis_data_calc(void)//底盘数据解算
 //@brief 将底盘三个方向的期望速度分解为底盘四个电机的期望速度
 void mackenaham_calc(fp32 vx_set,fp32 vy_set,fp32 wz_set)//麦轮运动学解算
 {
+    //这部分发送给电机
     chassis_control.wheel_speed[0] = -vx_set - vy_set +(CHASSIS_WZ_SET_SCALE - 1.0f) *CHASSISMOTOR_TO_CENTER* wz_set;
     chassis_control.wheel_speed[1] = vx_set - vy_set + (CHASSIS_WZ_SET_SCALE - 1.0f) *CHASSISMOTOR_TO_CENTER* wz_set;
     chassis_control.wheel_speed[2] = vx_set + vy_set + (CHASSIS_WZ_SET_SCALE - 1.0f) *CHASSISMOTOR_TO_CENTER* wz_set;
@@ -202,6 +210,7 @@ void mackenaham_calc(fp32 vx_set,fp32 vy_set,fp32 wz_set)//麦轮运动学解算
 //速度环
 void PID_Adjust(void)//PID调整
 {
+    //底盘四个电机的速度环控制
     chassis_motor_data.targrt_1 = (short)chassis_motor1_init.Calc(&chassis_motor1_init,MOTORDATA1.speed,chassis_control.wheel_speed[0]);
     chassis_motor_data.targrt_2 = (short)chassis_motor2_init.Calc(&chassis_motor2_init,MOTORDATA2.speed,chassis_control.wheel_speed[1]);
     chassis_motor_data.targrt_3 = (short)chassis_motor3_init.Calc(&chassis_motor3_init,MOTORDATA3.speed,chassis_control.wheel_speed[2]);

@@ -17,7 +17,7 @@
 /***************************************底盘相关定义*********************************************/
 //Chassis 底盘的一些宏定义
 #define ROLL_FORWARD 1
-#define ROLL_BACK    -1
+#define ROLL_BACK   -1
 
 //遥控器前进摇杆（max 660）转化成车体前进速度（m/s）的比例
 #define CHASSIS_VX_RC_SEN 0.002f
@@ -53,10 +53,10 @@
 #define CHASSIS_CAN hcan1//底盘采用can1口通讯
 
 /***************************************云台相关定义*********************************************/
-#define Motor_Ecd_to_Rad   0.000766990394f //      2*  PI  /8192  角度转换
+#define Motor_Ecd_to_Rad   0.000766990394f //      2*  PI  /8192  角度转换，机械角度转换为弧度制
 
 #define Half_ecd_range 4096   //电机码盘值中值
-#define ecd_range 8191                //电机码盘值最大值
+#define ecd_range 8191        //电机码盘值最大值
 
 //跟随底盘yaw模式下，遥控器的yaw遥杆（max 660）增加到车体角度的比例
 #define GIMBAL_YAW_RC_SEN 0.00300f

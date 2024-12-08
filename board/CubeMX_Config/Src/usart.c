@@ -24,12 +24,12 @@
 #include "bsp_system.h"
 /* USER CODE END 0 */
 
-UART_HandleTypeDef huart7;
-UART_HandleTypeDef huart8;
-UART_HandleTypeDef huart1;
-UART_HandleTypeDef huart2;
-UART_HandleTypeDef huart3;
-UART_HandleTypeDef huart6;
+UART_HandleTypeDef huart7;//
+UART_HandleTypeDef huart8;//陀螺仪
+UART_HandleTypeDef huart1;//遥控器
+UART_HandleTypeDef huart2;//蓝牙调试串口，临时上下位机通信
+UART_HandleTypeDef huart3;//
+UART_HandleTypeDef huart6;//裁判系统
 DMA_HandleTypeDef hdma_uart8_rx;
 DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart2_rx;
@@ -66,7 +66,7 @@ void MX_UART7_Init(void)
 
 }
 /* UART8 init function */
-void MX_UART8_Init(void)
+void MX_UART8_Init(void) //陀螺仪中断
 {
 
   /* USER CODE BEGIN UART8_Init 0 */
@@ -96,7 +96,7 @@ void MX_UART8_Init(void)
 }
 /* USART1 init function */
 
-void MX_USART1_UART_Init(void)
+void MX_USART1_UART_Init(void)//遥控器
 {
 
   /* USER CODE BEGIN USART1_Init 0 */
@@ -125,7 +125,7 @@ void MX_USART1_UART_Init(void)
 }
 /* USART2 init function */
 
-void MX_USART2_UART_Init(void)
+void MX_USART2_UART_Init(void)//调试串口，临时上下位机通信
 {
 
   /* USER CODE BEGIN USART2_Init 0 */
@@ -178,13 +178,14 @@ void MX_USART3_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART3_Init 2 */
-
+    HAL_UARTEx_ReceiveToIdle_DMA(&huart3, uart3_rx_dma_buffer, sizeof(uart3_rx_dma_buffer));
+    __HAL_DMA_DISABLE_IT(&hdma_usart3_rx ,DMA_IT_HT);
   /* USER CODE END USART3_Init 2 */
 
 }
 /* USART6 init function */
 
-void MX_USART6_UART_Init(void)
+void MX_USART6_UART_Init(void)//裁判系统
 {
 
   /* USER CODE BEGIN USART6_Init 0 */

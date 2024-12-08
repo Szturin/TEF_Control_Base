@@ -171,6 +171,7 @@ void CAN_cmd_gimbal(CANSend_TypeDef *motor)
 void CAN_cmd_shoot(CANSend_TypeDef *motor)
 {
     uint32_t send_mail_box;
+
     rt_tick_t start_tick = rt_tick_get();//记录当前时间戳
     shoot_tx_message.StdId = CAN_SHOOT_ID;
     shoot_tx_message.IDE = CAN_ID_STD;
@@ -195,7 +196,6 @@ void CAN_cmd_shoot(CANSend_TypeDef *motor)
 
 
     HAL_CAN_AddTxMessage(&SHOOT_CAN, &shoot_tx_message, shoot_can_send_data, &send_mail_box);
-
 }
 
 /**

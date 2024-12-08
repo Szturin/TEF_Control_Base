@@ -3,14 +3,14 @@
 /***************************************PID调参*********************************************/
 #define pitch_angle_pid \
 {\
-	.Kp = 80.0f,/*190*/\
-	.Ki = 0.1f, /*0.8*/\
+	.Kp = 95.0f,/*190*/\
+	.Ki = 0.0f, /*0.8*/\
 	.Kd = 100.0f, /*1.5*/    \
 	.Output_Max = 30000,/*15000*/\
 	.DeadZone = 0,\
 	.EIS_Max = 50000,\
 	.EAIS_Max = 50000,\
-	.Integral_Max = 300,\
+	.Integral_Max = 30000,\
 	.Error = {0,0,0},\
 	.Integral = 0,\
 	.Output = 0,\
@@ -37,19 +37,19 @@
 	.RST  = &PID_Reset,\
 }
 
-//k p =155
-// ki = 0.01
+//kp =155
+//ki = 0.01
 //kd = 1800
 #define yaw_angle_pid \
 {\
 	.Kp = 145.0f,\
-	.Ki = 0.0f, \
+	.Ki = 0.1f, \
 	.Kd = 1850.0f, \
 	.Output_Max = 30000,\
 	.DeadZone = 0,\
 	.EIS_Max = 50000,\
 	.EAIS_Max = 50000,\
-	.Integral_Max = 100,\
+	.Integral_Max = 50000,\
 	.Error = {0,0,0},\
 	.Integral = 0,\
 	.Output = 0,\
@@ -137,11 +137,6 @@ double map(double x, double min,double max, double min_t,double max_t)//将0到819
 
 /*************************************************************************************************
 
-
-
-
-
-
 *************************************************************************************************/
 
 void gimbaltask()
@@ -180,16 +175,13 @@ void gimbal_init(void)
 
 void gimbal_data_refresh(void)
 {
-
     yaw.now_ecd = DATAGIMBALYAW.ecd;
-
-    yaw.now_angle = JY901_data.angle.angle[2];
-
-    yaw.now_speed = JY901_data.w.w[2];
+    yaw.now_angle = JY901_data.angle.angle[2];//yaw轴角度获取
+    yaw.now_speed = JY901_data.w.w[2];//yaw轴角速度获取
 
     pit_1.now_ecd = DATAGIMBALPITCH_1.ecd;
-    pit_1.now_angle = JY901_data.angle.angle[0];
-    pit_1.now_speed = JY901_data.w.w[0];
+    pit_1.now_angle = JY901_data.angle.angle[0];//pitch轴角度获取
+    pit_1.now_speed = JY901_data.w.w[0];//pitch轴角速度获取
 
     pit_2.now_ecd = DATAGIMBALPITCH_2.ecd;
     pit_2.now_angle = JY901_data.angle.angle[0];

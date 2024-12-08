@@ -136,6 +136,9 @@ struct SQ
 {
     short q[4];
 };
-
+void ProcessAccData(uint8_t index);
+void ProcessGyroData(uint8_t index);
+void ProcessAngleData(uint8_t index);
+uint8_t CheckDataChecksum(uint8_t index);
 #endif
 

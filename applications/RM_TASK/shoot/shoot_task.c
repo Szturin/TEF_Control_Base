@@ -110,11 +110,11 @@ void shoot_remote_calc(void)
             break;
     */
         case 1://左上开关gps——> 停止射击
-            remote_mode = 3;//云台自由
+            remote_mode = 2;//云台自由
             shoot_mode = STOP;
             break;
         case 3://左上开关att1——> 自由射击
-            remote_mode = 3;//云台自由
+            remote_mode = 2;//云台自由
             if (shoot_mode != BACK)
             {
 
@@ -167,11 +167,19 @@ void shoot_remote_calc(void)
 
 }
 
+//注意：拨轮向上，退弹，拨轮向下，发射
 void speed1_feed(void)//定速喂弹
-{
+{/*
+
+    trigger.target_speed = -0.3;//转盘速度
+*/
+
     left_friction.target_speed = 3.5;
     right_friction.target_speed = -3.5;
-    trigger.target_speed = -0.3;//转盘速度
+   // left_friction.target_speed=(float)(abs(rc.remote.wheel))/660.0f*3.5f;//归一化
+   // right_friction.target_speed=-(float)(abs(rc.remote.wheel))/660.0f*3.5f;//归一化
+
+    trigger.target_speed = -(float)rc.remote.wheel/660.0f*0.4f;//归一化
 
     shoot_motor_data.targrt_1 = left_friction.send_data;
     shoot_motor_data.targrt_2 = right_friction.send_data;
@@ -187,10 +195,11 @@ void speed2_feed(void)//定角喂弹
     right_friction.target_speed = -3.5;
     trigger.target_speed = -0.35;//供弹速度，转盘
     */
-
-    left_friction.target_speed=(float)(abs(rc.remote.wheel))/660.0f*3.5f;//归一化
-    right_friction.target_speed=-(float)(abs(rc.remote.wheel))/660.0f*3.5f;//归一化
-    trigger.target_speed = (float)(abs(rc.remote.wheel))/660.0f*0.35f;//归一化
+    left_friction.target_speed = 3.5;
+    right_friction.target_speed = -3.5;
+    //left_friction.target_speed=(float)(abs(rc.remote.wheel))/660.0f*3.5f;//归一化
+   // right_friction.target_speed=-(float)(abs(rc.remote.wheel))/660.0f*3.5f;//归一化
+    trigger.target_speed = -(float)rc.remote.wheel/660.0f*0.4f;//归一化
 
     //设置速度
     shoot_motor_data.targrt_1 = left_friction.send_data;

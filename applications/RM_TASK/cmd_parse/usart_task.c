@@ -1,9 +1,12 @@
 #include "usart_task.h"
 
 uint8_t uart2_rx_dma_buffer[1024]={0};//串口2DMA缓冲区
-
-ringbuffer_t uart2_rb; //定义ringbuffer_t类型结构体变量
 uint8_t uart2_read_buffer[1024];//定义环形缓存区数组
+ringbuffer_t uart2_rb; //定义ringbuffer_t类型结构体变量
+
+uint8_t uart3_rx_dma_buffer[1024]={0};
+uint8_t uart3_read_buffer[1024];
+ringbuffer_t uart3_rb;
 
 DataPacket context; // 初始化上下文
 DataPacket context_task; // 初始化任务上下文
@@ -24,7 +27,6 @@ void AutoAim_DeviceInit()
 //空闲中断回调函数
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {
-
     if(huart->Instance == USART2)
     {
         if(!ringbuffer_is_full(&uart2_rb))
@@ -35,31 +37,53 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
         }
         memset(uart2_rx_dma_buffer,0,sizeof(uart2_rx_dma_buffer));
     }
+
+    if(huart->Instance == USART3)
+    {
+        if(!ringbuffer_is_full(&uart3_rb))
+        {
+            //my_printf(&huart2,"dma receive\r\n");
+
+            ringbuffer_write(&uart3_rb,uart3_rx_dma_buffer,Size);
+        }
+        memset(uart2_rx_dma_buffer,0,sizeof(uart3_rx_dma_buffer));
+    }
 }
 
 
 void uart_proc(void)
 {
-	// 如果环形缓冲区为空，直接返回 
-	if( ringbuffer_is_empty(&uart2_rb)) return;
+	// 如果环形缓冲区为空，直接返回 return;
+	if( !ringbuffer_is_empty(&uart2_rb)) {
+        // 从环形缓冲区读取数据到读取缓冲区
+        ringbuffer_read(&uart2_rb, uart2_read_buffer, uart2_rb.itemCount);
 
-    // 从环形缓冲区读取数据到读取缓冲区
-    ringbuffer_read(&uart2_rb, uart2_read_buffer, uart2_rb.itemCount);
+        // my_printf(&huart2,"proc is running");
 
-   // my_printf(&huart2,"proc is running");
+        //PID上位机调整解析
+        PID_UpdateFromCommand(&PID_Test,(const char *)uart2_read_buffer);
 
-    //PID上位机调整解析
-    PID_UpdateFromCommand(&PID_Test,(const char *)uart2_read_buffer);
+        //调试解析，将收到的串口数据帧解析，解析的数据放在context报文中
+        parse_buffer(uart2_read_buffer,sizeof(uart2_read_buffer),&context);
 
-    //调试解析，将收到的串口数据帧解析，解析的数据放在context报文中
-    parse_buffer(uart2_read_buffer,sizeof(uart2_read_buffer),&context);
+        //任务解析
+        //task_parse_buffer(uart2_read_buffer,sizeof(uart2_read_buffer),&context_task);
 
-    //任务解析
-    task_parse_buffer(uart2_read_buffer,sizeof(uart2_read_buffer),&context_task);
+        //SOC_Parse_buffer(uart2_read_buffer,sizeof(uart2_read_buffer),&AutoAim_device1);
 
-    SOC_Parse_buffer(uart2_read_buffer,sizeof(uart2_read_buffer),&AutoAim_device1);
+        memset(uart2_read_buffer, 0, sizeof(uart2_read_buffer));
+    }
 
-    memset(uart2_read_buffer, 0, sizeof(uart2_read_buffer));
+    if( !ringbuffer_is_empty(&uart3_rb)){
+        // 从环形缓冲区读取数据到读取缓冲区
+        ringbuffer_read(&uart3_rb, uart3_read_buffer, uart3_rb.itemCount);
+
+        SOC_Parse_buffer(uart3_read_buffer,sizeof(uart3_read_buffer),&AutoAim_device1);
+
+        memset(uart3_read_buffer, 0, sizeof(uart3_read_buffer));
+    }
+
+
 }
 
 void uart_sem_init()

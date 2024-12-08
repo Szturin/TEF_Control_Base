@@ -69,6 +69,7 @@ static void shoot_entry(void  *parameter){
 static void uart_entry(void  *parameter){
     while(1){
         uart_proc();
+        //my_printf(&huart2,"wheel:%d\r\n",rc.remote.wheel);
         rt_thread_mdelay(10);// tip：如果这里周期设置过长，时间片又只有10ms,没有成功解析就退出了线程
     }
 }
@@ -76,16 +77,15 @@ static void uart_entry(void  *parameter){
 int main(void)
 {
     HAL_Init();
-    gimbal_init();
     SystemClock_Config();
     MX_GPIO_Init();
     MX_DMA_Init();
     MX_CAN1_Init();
+    MX_CAN2_Init();
     MX_USART1_UART_Init();
     dbus_uart_init();
     MX_USART2_UART_Init();
     MX_USART6_UART_Init();
-    MX_CAN2_Init();
     MX_TIM2_Init();
     MX_TIM8_Init();
     MX_UART8_Init();
@@ -93,11 +93,14 @@ int main(void)
     MX_TIM4_Init();
     MX_TIM5_Init();
     MX_UART7_Init();
+
+    gimbal_init();
     User_USART_Init(&JY901_data);
     __HAL_UART_ENABLE_IT(&huart6, UART_IT_IDLE); //使能IDLE中断   裁判系统读取状态用
     HAL_UART_Receive_DMA(&huart6, RxBuff, RxBuff_SIZE);//打开DMA接收
     can_filter_init();
-    ringbuffer_init(&uart2_rb);
+    ringbuffer_init(&uart2_rb);//蓝牙调试串口
+    ringbuffer_init(&uart3_rb);//上下位机通信
     AutoAim_DeviceInit();
 
     /* set LED0 pin mode to output */
@@ -136,7 +139,7 @@ void RM_thread_create(void)
     thread_chassis = rt_thread_create("thread4",
                                       chassis_entry,
                                       RT_NULL,
-                                      4096,16,20);
+                                      4096,14,20);
     thread_shoot = rt_thread_create("thread5",
                                       shoot_entry,
                                       RT_NULL,
@@ -144,5 +147,5 @@ void RM_thread_create(void)
     thread_uart = rt_thread_create("thread6",
                                    uart_entry,
                                    RT_NULL,
-                                  4096,20,15);
+                                  4096,16,15);
 }

@@ -10,6 +10,9 @@ int My_printf(UART_HandleTypeDef *huart, const char *format, ...);
 extern uint8_t uart2_rx_dma_buffer[1024];
 extern uint8_t uart2_read_buffer[1024];
 
+extern uint8_t uart3_rx_dma_buffer[1024];
+extern uint8_t uart3_read_buffer[1024];
+
 //接收上下文结构体
 typedef struct {
     uint8_t data_type; // 数据类型
@@ -19,7 +22,7 @@ typedef struct {
 int parse_buffer(uint8_t *buffer,size_t size,DataPacket* data);
 int task_parse_buffer(uint8_t *buffer,size_t size,DataPacket* task_data);
 void AutoAim_DeviceInit();
-        void uart_sem_init();
+void uart_sem_init();
 
 /****自瞄结构体****/
 typedef struct {
