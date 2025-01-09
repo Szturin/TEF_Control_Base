@@ -59,7 +59,9 @@
 #define ecd_range 8191        //电机码盘值最大值
 
 //跟随底盘yaw模式下，遥控器的yaw遥杆（max 660）增加到车体角度的比例
-#define GIMBAL_YAW_RC_SEN 0.00300f
+//GIMBAL_YAW_RC_SEN = 1 / 660 * (最大遥控转速)
+//这样，遥控器的最大通道值 660 对应 最大遥控转速
+#define GIMBAL_YAW_RC_SEN 0.001287f
 #define GIMBAL_PIT_RC_SEN 0.00115f
 
 #define GIMBAL_CAN hcan2//云台预采用can2口通讯

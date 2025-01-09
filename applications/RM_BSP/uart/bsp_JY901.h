@@ -140,5 +140,6 @@ void ProcessAccData(uint8_t index);
 void ProcessGyroData(uint8_t index);
 void ProcessAngleData(uint8_t index);
 uint8_t CheckDataChecksum(uint8_t index);
+float error_angle_calc(float target_angle, float now_angle);
 #endif
 

@@ -226,7 +226,7 @@ void gimbal_remote_calc(void)
     }
     else if(remote_mode == 3)/*自瞄模式*/
     {
-        pit_1.target_angle = target_angle_calc(pit_1.target_angle,AutoAim_device1.pitch_offset);
+        pit_1.target_angle += AutoAim_device1.pitch_offset;
         AutoAim_device1.pitch_offset = 0;
     }
 
@@ -236,12 +236,11 @@ void gimbal_remote_calc(void)
     /*判断是否在自瞄模式*/
     if(remote_mode != 3){
         yaw.add_angle=(double)rc.remote.ch1*GIMBAL_YAW_RC_SEN;
-        SATURATE(yaw.add_angle,-0.85f,0.85f);//yaw轴每次不超过1.5度转向
-        yaw.target_angle = target_angle_calc(yaw.target_angle,-yaw.add_angle);
+        yaw.target_angle -= yaw.add_angle;
     }
     else{
-        SATURATE(AutoAim_device1.yaw_offset,-0.85f,0.85f);
-        yaw.target_angle= target_angle_calc(yaw.target_angle,-AutoAim_device1.yaw_offset);
+        SATURATE(AutoAim_device1.yaw_offset,-0.85f,0.85f);//限制最大转角，防止云台跑飞。
+        yaw.target_angle -= AutoAim_device1.yaw_offset;
         AutoAim_device1.yaw_offset=0;
     }
 }
@@ -290,19 +289,6 @@ static float relative_angle_calc(unsigned int angle, unsigned int initial_angle)
     return relative_ecd * Motor_Ecd_to_Rad;
 }
 
-static float target_angle_calc(float angle, float add)
-{
-    float relative_angle = angle + add;
-    if (relative_angle > 180)
-    {
-        relative_angle -= 360;
-    }
-    else if (relative_angle < -180)
-    {
-        relative_angle += 360;
-    }
-    return relative_angle;
-}
 
 static float filtering(float last_angle, float angle)
 {

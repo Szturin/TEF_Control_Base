@@ -173,8 +173,7 @@ void ProcessAngleData(uint8_t index)
 
 float error_angle_calc(float target_angle, float now_angle)//ÍÓÂÝÒÇ×îÐ¡²î½Ç¼ÆËã
 {
-    float error_angle;
-    error_angle = target_angle - now_angle;
+    float  error_angle = target_angle - now_angle;
 
     if (error_angle > 180)
     {
